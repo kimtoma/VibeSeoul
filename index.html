@@ -7,7 +7,6 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0a0a0f">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="description" content="Transform K-content into sensory Seoul experiences with AI-powered location mapping, artwork, and soundscapes.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=Noto+Sans+KR:wght@300;500;700&display=swap" rel="stylesheet">
   <script src="https://www.youtube.com/iframe_api"></script>
@@ -17,10 +16,9 @@
     :root {
       --bg: #0a0a0f;
       --text: #f0f0f0;
-      --text-dim: #888;
+      --text-dim: #777;
       --accent: #FFB800;
       --accent-glow: rgba(255,184,0,0.2);
-      --radius: 20px;
       --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -34,549 +32,380 @@
 
     /* ===== SCREENS ===== */
     .screen {
-      position: fixed;
-      inset: 0;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      position: fixed; inset: 0;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .screen.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .screen.active { opacity: 1; pointer-events: auto; }
 
-    /* ===== ATMOSPHERIC ORBS (kimtoma.com style) ===== */
+    /* ===== ATMOSPHERIC ORBS ===== */
     .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      pointer-events: none;
-      z-index: 0;
+      position: absolute; border-radius: 50%;
+      pointer-events: none; z-index: 0;
     }
     .orb-1 {
-      width: 70vw; height: 70vw;
-      top: -20%; left: -15%;
-      background: radial-gradient(circle, rgba(255,184,0,0.12) 0%, transparent 65%);
-      animation: drift1 22s ease-in-out infinite;
+      width: 75vw; height: 75vw; top: -22%; left: -12%;
+      background: radial-gradient(circle, rgba(255,184,0,0.1) 0%, transparent 65%);
+      filter: blur(70px);
+      animation: orbDrift1 24s ease-in-out infinite;
     }
     .orb-2 {
-      width: 55vw; height: 55vw;
-      bottom: -15%; right: -10%;
-      background: radial-gradient(circle, rgba(167,139,250,0.1) 0%, transparent 65%);
-      animation: drift2 28s ease-in-out infinite;
+      width: 60vw; height: 60vw; bottom: -18%; right: -8%;
+      background: radial-gradient(circle, rgba(167,139,250,0.09) 0%, transparent 65%);
+      filter: blur(80px);
+      animation: orbDrift2 30s ease-in-out infinite;
     }
     .orb-3 {
-      width: 40vw; height: 40vw;
-      top: 35%; right: 15%;
+      width: 45vw; height: 45vw; top: 32%; right: 18%;
       background: radial-gradient(circle, rgba(0,212,255,0.07) 0%, transparent 65%);
-      animation: drift3 18s ease-in-out 3s infinite;
+      filter: blur(60px);
+      animation: orbDrift3 20s ease-in-out 4s infinite;
     }
-    @keyframes drift1 {
+    @keyframes orbDrift1 {
       0%,100% { transform: translate(0,0) scale(1); }
-      25%  { transform: translate(4vw, 3vh) scale(1.08); }
-      50%  { transform: translate(2vw, 7vh) scale(0.94); }
-      75%  { transform: translate(-3vw, 2vh) scale(1.04); }
+      30%  { transform: translate(5vw, 4vh) scale(1.1); }
+      60%  { transform: translate(2vw, 8vh) scale(0.93); }
     }
-    @keyframes drift2 {
+    @keyframes orbDrift2 {
       0%,100% { transform: translate(0,0) scale(1); }
-      33%  { transform: translate(-4vw,-5vh) scale(1.1); }
-      66%  { transform: translate(3vw,-2vh) scale(0.92); }
+      40%  { transform: translate(-5vw,-4vh) scale(1.08); }
+      70%  { transform: translate(3vw,-2vh) scale(0.94); }
     }
-    @keyframes drift3 {
+    @keyframes orbDrift3 {
       0%,100% { transform: translate(0,0) scale(1); opacity: 0.8; }
-      50%  { transform: translate(-4vw, 5vh) scale(1.15); opacity: 1; }
+      50%  { transform: translate(-4vw, 5vh) scale(1.18); opacity: 1; }
     }
 
-    /* ===== LANDING SCREEN ===== */
-    #landingScreen { background: var(--bg); }
+    /* ===== LANDING ===== */
+    #landingScreen { background: var(--bg); overflow: hidden; }
 
     .landing-header {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      z-index: 10;
-      padding: 28px 32px 0;
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
+      position: absolute; top: 0; left: 0; right: 0;
+      z-index: 50;
+      padding: 26px 28px;
+      display: flex; align-items: baseline; gap: 10px;
+      pointer-events: none;
     }
-    .logo {
-      font-weight: 900;
-      font-size: 1.4rem;
-      letter-spacing: -0.03em;
-    }
-    .logo span { color: var(--accent); transition: color var(--transition); }
+    .logo { font-size: 1.25rem; font-weight: 900; letter-spacing: -0.03em; }
+    .logo span { color: var(--accent); }
     .logo-sub {
-      font-size: 0.7rem;
-      color: var(--text-dim);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
+      font-size: 0.65rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--text-dim);
     }
 
-    /* Cover flow container */
-    .coverflow-wrap {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 5;
-      perspective: 1200px;
+    /* Scatter stage — full screen canvas for posters */
+    .scatter-stage {
+      position: absolute; inset: 0; overflow: hidden; z-index: 5;
     }
-
-    .coverflow-stage {
-      position: relative;
-      width: 100%;
-      height: 420px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transform-style: preserve-3d;
-      cursor: grab;
-    }
-    .coverflow-stage:active { cursor: grabbing; }
 
     /* Individual poster */
     .poster {
       position: absolute;
-      width: 200px;
-      height: 300px;
-      border-radius: 24px;
-      overflow: hidden;
       cursor: pointer;
-      transform-style: preserve-3d;
-      transition: transform 0.55s cubic-bezier(0.4,0,0.2,1),
-                  box-shadow 0.55s cubic-bezier(0.4,0,0.2,1),
-                  opacity 0.55s;
-      user-select: none;
+      z-index: 10;
       -webkit-user-drag: none;
+      user-select: none;
     }
+    .poster:hover { z-index: 100; }
+    .poster.clicking { z-index: 200; }
 
-    .poster-inner {
-      width: 100%; height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      padding: 20px 16px;
+    .poster-frame {
+      width: 100%;
+      aspect-ratio: 2/3;
+      border-radius: 14px;
+      overflow: hidden;
       position: relative;
+      border: 2.5px solid rgba(255,255,255,0.12);
+      box-shadow:
+        0 8px 32px rgba(0,0,0,0.55),
+        0 2px 8px rgba(0,0,0,0.35),
+        inset 0 1px 0 rgba(255,255,255,0.06);
+      transition: box-shadow 0.35s, border-color 0.35s, transform 0.25s;
+      will-change: transform;
+      background: var(--poster-bg, #111);
+    }
+    .poster:hover .poster-frame {
+      border-color: rgba(255,255,255,0.35);
+      box-shadow:
+        0 20px 60px rgba(0,0,0,0.65),
+        0 0 40px var(--poster-glow, rgba(255,184,0,0.3));
+    }
+    .poster.clicking .poster-frame {
+      transform: scale(1.1);
+      border-color: rgba(255,255,255,0.6);
+      box-shadow:
+        0 28px 80px rgba(0,0,0,0.75),
+        0 0 70px var(--poster-glow, rgba(255,184,0,0.5));
     }
 
-    .poster-emoji {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -62%);
-      font-size: 4rem;
-      filter: drop-shadow(0 8px 20px rgba(0,0,0,0.5));
-      pointer-events: none;
+    /* Fallback bg + emoji (shown while image loads) */
+    .poster-fallback {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3.5rem;
+      background: var(--poster-bg, #111);
     }
 
+    /* Real poster image */
+    .poster-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+    .poster-img.loaded { opacity: 1; }
+
+    /* Shimmer skeleton while loading */
+    .poster-shimmer {
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg,
+        rgba(255,255,255,0.03) 25%,
+        rgba(255,255,255,0.08) 50%,
+        rgba(255,255,255,0.03) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.8s infinite;
+    }
+    .poster-shimmer.hidden { display: none; }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Title overlay at bottom */
+    .poster-info {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 28px 12px 12px;
+      background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 100%);
+      border-radius: 0 0 12px 12px;
+    }
     .poster-genre {
-      font-size: 0.65rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.5);
-      margin-bottom: 6px;
-    }
-    .poster-title-ko {
-      font-family: 'Noto Sans KR', sans-serif;
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.6);
+      font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--poster-accent, var(--accent));
       margin-bottom: 4px;
     }
-    .poster-title {
-      font-size: 1.05rem;
-      font-weight: 700;
-      text-align: center;
-      line-height: 1.2;
-      color: #fff;
+    .poster-title { font-size: 0.92rem; font-weight: 700; line-height: 1.2; }
+    .poster-ko {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.68rem; color: rgba(255,255,255,0.45); margin-top: 2px;
     }
 
-    /* Floating animation per poster — staggered */
-    .poster:nth-child(1) { animation: floatPoster 6.5s ease-in-out infinite; }
-    .poster:nth-child(2) { animation: floatPoster 7.2s ease-in-out 0.8s infinite; }
-    .poster:nth-child(3) { animation: floatPoster 6.0s ease-in-out 1.6s infinite; }
-    .poster:nth-child(4) { animation: floatPoster 7.8s ease-in-out 0.4s infinite; }
-    .poster:nth-child(5) { animation: floatPoster 6.8s ease-in-out 1.2s infinite; }
-    .poster:nth-child(6) { animation: floatPoster 7.5s ease-in-out 2.0s infinite; }
-    .poster:nth-child(7) { animation: floatPoster 6.2s ease-in-out 0.6s infinite; }
-
-    @keyframes floatPoster {
-      0%,100% { transform: var(--poster-transform) translateY(0px); }
-      50%      { transform: var(--poster-transform) translateY(-12px); }
-    }
-
-    /* Cover flow tap hint */
+    /* Tap hint */
     .tap-hint {
-      position: absolute;
-      bottom: 36px;
-      left: 50%;
+      position: absolute; bottom: 28px; left: 50%;
       transform: translateX(-50%);
-      font-size: 0.72rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      z-index: 10;
-      animation: pulse 2.5s ease-in-out infinite;
+      font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.25); z-index: 50; white-space: nowrap;
+      animation: hintPulse 3s ease-in-out infinite;
     }
-    @keyframes pulse {
-      0%,100% { opacity: 0.4; }
-      50% { opacity: 1; }
+    @keyframes hintPulse {
+      0%,100% { opacity: 0.3; } 50% { opacity: 0.8; }
     }
 
-    /* Nav dots */
-    .nav-dots {
-      display: flex;
-      gap: 8px;
-      margin-top: 28px;
-      z-index: 10;
-    }
-    .nav-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.2);
-      transition: all 0.3s;
-      cursor: pointer;
-    }
-    .nav-dot.active {
-      width: 20px;
-      border-radius: 3px;
-      background: var(--accent);
-    }
-
-    /* ===== LOADING SCREEN ===== */
+    /* ===== LOADING ===== */
     #loadingScreen {
       background: var(--bg);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 20px;
     }
-    .load-poster-preview {
-      width: 120px; height: 180px;
-      border-radius: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3rem;
-      animation: loadPulse 1.5s ease-in-out infinite;
+    .load-preview {
+      width: 110px; height: 165px;
+      border-radius: 16px; overflow: hidden;
+      position: relative;
+      border: 2px solid rgba(255,255,255,0.1);
+      animation: loadBreath 1.6s ease-in-out infinite;
     }
-    @keyframes loadPulse {
-      0%,100% { transform: scale(1); opacity: 0.8; }
-      50% { transform: scale(1.05); opacity: 1; }
+    @keyframes loadBreath {
+      0%,100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.04); opacity: 1; }
     }
-    .loading-text {
-      font-size: 1.1rem;
-      color: var(--text-dim);
-      letter-spacing: 0.05em;
+    .load-preview-img { width: 100%; height: 100%; object-fit: cover; }
+    .load-preview-fallback {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.8rem;
     }
+    .loading-text { font-size: 1rem; color: var(--text-dim); letter-spacing: 0.04em; }
     .loading-text span { color: var(--accent); font-weight: 700; }
-    .loading-dots {
-      display: flex; gap: 6px;
-    }
+    .loading-dots { display: flex; gap: 6px; }
     .loading-dots span {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--accent);
+      width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
       animation: dotBounce 1.2s ease-in-out infinite;
     }
     .loading-dots span:nth-child(2) { animation-delay: 0.15s; }
     .loading-dots span:nth-child(3) { animation-delay: 0.3s; }
     @keyframes dotBounce {
-      0%,80%,100% { transform: scale(0.6); opacity: 0.4; }
+      0%,80%,100% { transform: scale(0.5); opacity: 0.35; }
       40% { transform: scale(1); opacity: 1; }
     }
 
-    /* ===== RESULT SCREEN ===== */
+    /* ===== RESULT ===== */
     #resultScreen { background: #000; }
 
-    /* Map fills everything */
-    #map {
-      position: absolute;
-      inset: 0;
-      width: 100%; height: 100%;
-      z-index: 0;
-    }
+    #map { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
 
-    /* Top bar overlay */
     .result-topbar {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      z-index: 20;
-      padding: 20px 20px 0;
-      display: flex;
-      align-items: center;
-      gap: 14px;
+      position: absolute; top: 0; left: 0; right: 0; z-index: 20;
+      padding: 20px 20px 50px;
+      display: flex; align-items: center; gap: 14px;
       background: linear-gradient(to bottom, rgba(10,10,15,0.85) 0%, transparent 100%);
-      padding-bottom: 40px;
     }
     .back-btn {
-      width: 42px; height: 42px;
-      border-radius: 50%;
+      width: 40px; height: 40px; border-radius: 50%;
       background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.15);
-      color: #fff;
-      font-size: 1.2rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      flex-shrink: 0;
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: #fff; font-size: 1.1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, transform 0.2s;
     }
     .back-btn:hover { background: rgba(255,255,255,0.18); transform: scale(1.05); }
+    .result-content-title { font-size: 1.05rem; font-weight: 700; line-height: 1.2; }
+    .result-mood-label { font-size: 0.72rem; color: var(--accent); margin-top: 3px; transition: color var(--transition); }
 
-    .result-title-wrap { flex: 1; }
-    .result-content-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      line-height: 1.2;
-    }
-    .result-mood-label {
-      font-size: 0.75rem;
-      color: var(--accent);
-      margin-top: 2px;
-      transition: color var(--transition);
-    }
-
-    /* Bottom overlay panel */
+    /* Bottom glass panel */
     .spots-panel {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      z-index: 20;
-      background: linear-gradient(to top, rgba(10,10,15,0.97) 60%, transparent 100%);
-      padding: 0 0 24px;
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 20;
+      background: linear-gradient(to top, rgba(8,8,14,0.97) 55%, transparent 100%);
+      padding: 0 0 env(safe-area-inset-bottom, 16px);
     }
 
-    /* Music player */
     .music-player {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px 20px 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 20px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
     }
     .play-btn {
-      width: 38px; height: 38px;
-      border-radius: 50%;
-      background: var(--accent);
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: transform 0.2s, background var(--transition);
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--accent); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: transform 0.2s, background var(--transition);
     }
     .play-btn:hover { transform: scale(1.08); }
-    .play-btn svg { width: 16px; height: 16px; fill: #0a0a0f; }
+    .play-btn svg { width: 15px; height: 15px; fill: #0a0a0f; }
     .music-info { flex: 1; min-width: 0; }
     .music-track {
-      font-size: 0.85rem;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 0.82rem; font-weight: 600;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .music-artist {
-      font-size: 0.7rem;
-      color: var(--text-dim);
-      margin-top: 2px;
-    }
-    .volume-slider {
-      width: 72px;
-      accent-color: var(--accent);
-      flex-shrink: 0;
-    }
+    .music-artist { font-size: 0.68rem; color: var(--text-dim); margin-top: 2px; }
+    .volume-slider { width: 68px; accent-color: var(--accent); flex-shrink: 0; }
 
-    /* Location cards — horizontal scroll */
+    /* Location cards */
     .cards-label {
-      padding: 12px 20px 8px;
-      font-size: 0.7rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-dim);
+      padding: 10px 20px 6px;
+      font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim);
     }
     .cards-scroll {
-      display: flex;
-      gap: 12px;
-      padding: 0 20px 4px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scroll-snap-type: x mandatory;
-      scrollbar-width: none;
+      display: flex; gap: 10px; padding: 2px 20px 8px;
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory; scrollbar-width: none;
     }
     .cards-scroll::-webkit-scrollbar { display: none; }
 
     .location-card {
-      flex-shrink: 0;
-      width: 220px;
-      background: rgba(255,255,255,0.07);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px;
-      padding: 14px;
-      cursor: pointer;
+      flex-shrink: 0; width: 210px;
+      background: rgba(255,255,255,0.065);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 16px; padding: 13px; cursor: pointer;
       scroll-snap-align: start;
-      transition: all 0.3s;
-      animation: cardSlideIn 0.4s ease-out both;
+      transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+      animation: cardIn 0.4s ease-out both;
     }
     .location-card:nth-child(1) { animation-delay: 0.05s; }
     .location-card:nth-child(2) { animation-delay: 0.12s; }
     .location-card:nth-child(3) { animation-delay: 0.19s; }
     .location-card:nth-child(4) { animation-delay: 0.26s; }
     .location-card:nth-child(5) { animation-delay: 0.33s; }
-    @keyframes cardSlideIn {
-      from { opacity: 0; transform: translateY(16px); }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(14px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    .location-card:hover,
-    .location-card.active {
-      background: rgba(255,255,255,0.13);
+    .location-card:hover, .location-card.active {
+      background: rgba(255,255,255,0.12);
       border-color: var(--accent);
-      box-shadow: 0 0 24px var(--accent-glow);
+      box-shadow: 0 0 22px var(--accent-glow);
     }
-
-    .card-num-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
+    .card-row1 { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
     .card-num {
-      width: 22px; height: 22px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #0a0a0f;
-      font-size: 0.72rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: background var(--transition);
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--accent); color: #0a0a0f;
+      font-size: 0.68rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background var(--transition);
     }
-    .card-neighborhood {
-      font-size: 0.68rem;
-      color: var(--accent);
-      letter-spacing: 0.05em;
-      transition: color var(--transition);
-    }
-    .card-name-en {
-      font-weight: 700;
-      font-size: 0.95rem;
-      line-height: 1.2;
-    }
-    .card-name-ko {
-      font-family: 'Noto Sans KR', sans-serif;
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      margin-top: 2px;
-    }
-    .card-reason {
-      font-size: 0.75rem;
-      color: rgba(255,255,255,0.5);
-      line-height: 1.4;
-      margin-top: 8px;
-    }
+    .card-neighborhood { font-size: 0.65rem; color: var(--accent); transition: color var(--transition); }
+    .card-name-en { font-weight: 700; font-size: 0.9rem; line-height: 1.2; }
+    .card-name-ko { font-family: 'Noto Sans KR', sans-serif; font-size: 0.72rem; color: var(--text-dim); margin-top: 2px; }
+    .card-reason { font-size: 0.72rem; color: rgba(255,255,255,0.45); line-height: 1.4; margin-top: 7px; }
     .card-image {
-      width: 100%;
-      aspect-ratio: 4/3;
-      border-radius: 10px;
-      overflow: hidden;
-      margin-top: 10px;
-      background: rgba(255,255,255,0.04);
-      position: relative;
+      width: 100%; aspect-ratio: 4/3;
+      border-radius: 9px; overflow: hidden; margin-top: 9px;
+      background: rgba(255,255,255,0.04); position: relative;
     }
     .card-image img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transition: opacity 0.6s;
+      width: 100%; height: 100%; object-fit: cover;
+      opacity: 0; transition: opacity 0.6s;
     }
     .card-image img.loaded { opacity: 1; }
     .skeleton {
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       background: linear-gradient(90deg,
-        rgba(255,255,255,0.03) 25%,
-        rgba(255,255,255,0.07) 50%,
-        rgba(255,255,255,0.03) 75%);
+        rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%);
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
-    }
-    @keyframes shimmer {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
     }
     .skeleton.hidden { display: none; }
 
     /* Error toast */
     .error-toast {
-      position: fixed;
-      bottom: 30px; left: 50%; transform: translateX(-50%);
-      background: rgba(255,60,60,0.15);
-      border: 1px solid rgba(255,60,60,0.3);
-      backdrop-filter: blur(12px);
-      padding: 12px 24px;
-      border-radius: 40px;
-      color: #ff6b6b;
-      font-size: 0.85rem;
-      z-index: 999;
-      display: none;
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: rgba(255,60,60,0.14); border: 1px solid rgba(255,60,60,0.3);
+      backdrop-filter: blur(12px); padding: 11px 24px; border-radius: 40px;
+      color: #ff7070; font-size: 0.82rem; z-index: 999;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
     }
-    .error-toast.active { display: block; }
+    .error-toast.active { opacity: 1; pointer-events: auto; }
   </style>
 </head>
 <body>
 
-<!-- ===== LANDING SCREEN ===== -->
+<!-- ===== LANDING ===== -->
 <div class="screen active" id="landingScreen">
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
-
   <header class="landing-header">
     <div class="logo">Vibe<span>Seoul</span></div>
     <div class="logo-sub">Feel K-Content</div>
   </header>
-
-  <div class="coverflow-wrap">
-    <div class="coverflow-stage" id="coverflowStage"></div>
-    <div class="nav-dots" id="navDots"></div>
-  </div>
-
-  <div class="tap-hint">tap to explore Seoul</div>
+  <div class="scatter-stage" id="scatterStage"></div>
+  <div class="tap-hint">tap a poster to vibe</div>
 </div>
 
-<!-- ===== LOADING SCREEN ===== -->
+<!-- ===== LOADING ===== -->
 <div class="screen" id="loadingScreen">
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
-  <div class="load-poster-preview" id="loadPosterPreview"></div>
-  <div class="loading-text">Vibing with <span>Seoul</span>...</div>
-  <div class="loading-dots">
-    <span></span><span></span><span></span>
+  <div class="load-preview" id="loadPreview">
+    <div class="load-preview-fallback" id="loadFallback"></div>
+    <img class="load-preview-img" id="loadImg" style="display:none">
   </div>
+  <div class="loading-text">Vibing with <span>Seoul</span>...</div>
+  <div class="loading-dots"><span></span><span></span><span></span></div>
 </div>
 
-<!-- ===== RESULT SCREEN ===== -->
+<!-- ===== RESULT ===== -->
 <div class="screen" id="resultScreen">
   <div id="map"></div>
-
   <div class="result-topbar">
     <button class="back-btn" id="backBtn">←</button>
-    <div class="result-title-wrap">
+    <div>
       <div class="result-content-title" id="resultTitle"></div>
       <div class="result-mood-label" id="moodBanner"></div>
     </div>
   </div>
-
   <div class="spots-panel">
     <div class="music-player">
       <button class="play-btn" id="audioPlayBtn">
@@ -589,117 +418,199 @@
       </div>
       <input type="range" class="volume-slider" id="audioVolume" min="0" max="100" value="30">
     </div>
-
     <div class="cards-label">Seoul Spots</div>
     <div class="cards-scroll" id="cardsPanel"></div>
   </div>
 </div>
 
-<!-- Error toast -->
 <div class="error-toast" id="errorMsg">😔 Something went wrong. Try again.</div>
 
 <script>
   // ===== K-CONTENT CATALOGUE =====
+  // tmdbQuery: search term for TMDB poster API
+  // posterUrl: hardcoded fallback (e.g. YouTube thumbnail for music videos)
   const CONTENTS = [
-    { query: 'Squid Game',                   titleKo: '오징어 게임',    emoji: '🦑', genre: 'Thriller',        bg: 'linear-gradient(145deg,#1a0505,#3a0010)', accent: '#FF2D55' },
-    { query: 'Goblin 도깨비',                 titleKo: '도깨비',         emoji: '👻', genre: 'Fantasy Romance', bg: 'linear-gradient(145deg,#080820,#1a0d35)', accent: '#A78BFA' },
-    { query: 'BTS Dynamite',                 titleKo: 'BTS 다이너마이트', emoji: '🎵', genre: 'K-Pop',           bg: 'linear-gradient(145deg,#060e1f,#0a2040)', accent: '#00D4FF' },
-    { query: 'K-Pop Demon Hunters',          titleKo: '케이팝 악마헌터', emoji: '😈', genre: 'Action',          bg: 'linear-gradient(145deg,#080f05,#102008)', accent: '#34D399' },
-    { query: 'When Life Gives You Tangerines 귤이 익는 시절', titleKo: '귤이 익는 시절', emoji: '🍊', genre: 'Drama', bg: 'linear-gradient(145deg,#1a0d00,#2d1800)', accent: '#FFB800' },
-    { query: 'Parasite 기생충',               titleKo: '기생충',          emoji: '🎬', genre: 'Thriller',        bg: 'linear-gradient(145deg,#0a0a0a,#1c1c22)', accent: '#C0C0C0' },
-    { query: 'Reply 1988 응답하라 1988',       titleKo: '응답하라 1988',   emoji: '📺', genre: 'Nostalgia',       bg: 'linear-gradient(145deg,#180814,#2a0f22)', accent: '#FF9ECD' },
+    {
+      query: 'Squid Game',
+      tmdbQuery: 'Squid Game',
+      titleKo: '오징어 게임', emoji: '🦑', genre: 'Thriller',
+      bg: 'linear-gradient(160deg,#1a0505,#3a0010,#0a0a0f)',
+      accent: '#FF2D55', glow: 'rgba(255,45,85,0.35)',
+    },
+    {
+      query: 'Goblin 도깨비',
+      tmdbQuery: '도깨비',
+      titleKo: '도깨비', emoji: '👻', genre: 'Fantasy Romance',
+      bg: 'linear-gradient(160deg,#06061c,#1a0d35,#0a0a0f)',
+      accent: '#A78BFA', glow: 'rgba(167,139,250,0.35)',
+    },
+    {
+      query: 'BTS Dynamite',
+      tmdbQuery: null,
+      posterUrl: 'https://img.youtube.com/vi/gdZLi9oWNZg/maxresdefault.jpg',
+      titleKo: 'BTS 다이너마이트', emoji: '🎵', genre: 'K-Pop',
+      bg: 'linear-gradient(160deg,#040d1e,#0a2040,#0a0a0f)',
+      accent: '#00D4FF', glow: 'rgba(0,212,255,0.35)',
+    },
+    {
+      query: 'K-Pop Demon Hunters',
+      tmdbQuery: 'K-Pop Demon Hunters',
+      titleKo: '케이팝 악마헌터', emoji: '😈', genre: 'Action',
+      bg: 'linear-gradient(160deg,#080f05,#102008,#0a0a0f)',
+      accent: '#34D399', glow: 'rgba(52,211,153,0.35)',
+    },
+    {
+      query: 'When Life Gives You Tangerines 귤이 익는 시절',
+      tmdbQuery: '귤이 익는 시절',
+      titleKo: '귤이 익는 시절', emoji: '🍊', genre: 'Drama',
+      bg: 'linear-gradient(160deg,#1a0d00,#2d1800,#0a0a0f)',
+      accent: '#FFB800', glow: 'rgba(255,184,0,0.35)',
+    },
+    {
+      query: 'Parasite 기생충',
+      tmdbQuery: 'Parasite 기생충',
+      titleKo: '기생충', emoji: '🎬', genre: 'Thriller',
+      bg: 'linear-gradient(160deg,#0a0a0a,#1c1c22,#0a0a0f)',
+      accent: '#E0E0E0', glow: 'rgba(220,220,220,0.25)',
+    },
+    {
+      query: 'Reply 1988 응답하라 1988',
+      tmdbQuery: 'Reply 1988',
+      titleKo: '응답하라 1988', emoji: '📺', genre: 'Nostalgia',
+      bg: 'linear-gradient(160deg,#180814,#2a0f22,#0a0a0f)',
+      accent: '#FF9ECD', glow: 'rgba(255,158,205,0.35)',
+    },
   ];
 
-  let activeIdx = Math.floor(CONTENTS.length / 2);
-  let isDragging = false, dragStartX = 0, dragDeltaX = 0;
+  // ===== SCATTER LAYOUT =====
+  // x, y: left/top in viewport % (can be negative = partially offscreen)
+  // rot: rotation in degrees
+  // w: width in px (desktop), scaled down on mobile
+  // dx, dy: float animation translation range in px
+  // dur: animation duration in seconds
+  const LAYOUT = [
+    { x: -3,  y:  3,  rot: -5, w: 162, dx:  5, dy: -13, dur: 6.8 },
+    { x: 29,  y: -1,  rot:  4, w: 180, dx: -4, dy: -11, dur: 7.4 },
+    { x: 60,  y:  7,  rot: -8, w: 153, dx:  6, dy: -10, dur: 6.1 },
+    { x: -4,  y: 46,  rot:  7, w: 168, dx:  6, dy: -14, dur: 7.9 },
+    { x: 38,  y: 41,  rot: -3, w: 194, dx: -5, dy: -13, dur: 6.5 },
+    { x: 67,  y: 44,  rot:  9, w: 156, dx:  4, dy: -11, dur: 7.6 },
+    { x: 21,  y: 67,  rot: -5, w: 173, dx: -5, dy: -12, dur: 6.3 },
+  ];
 
-  // ===== BUILD COVER FLOW =====
-  function buildCoverflow() {
-    const stage = document.getElementById('coverflowStage');
-    const dots  = document.getElementById('navDots');
+  const isMobile = window.innerWidth < 640;
+
+  // ===== BUILD SCATTER POSTERS =====
+  function buildScatter() {
+    const stage = document.getElementById('scatterStage');
     stage.innerHTML = '';
-    dots.innerHTML  = '';
 
     CONTENTS.forEach((c, i) => {
-      // Poster
+      const pos = LAYOUT[i];
+      const w   = isMobile ? Math.round(pos.w * 0.72) : pos.w;
+
+      // Generate unique CSS keyframe for this poster's float path
+      const kfName = `posterFloat${i}`;
+      const styleEl = document.createElement('style');
+      styleEl.textContent = `
+        @keyframes ${kfName} {
+          0%   { transform: rotate(${pos.rot}deg) translate(0px, 0px); }
+          20%  { transform: rotate(${pos.rot * 0.85}deg) translate(${pos.dx * 0.4}px, ${pos.dy * 0.7}px); }
+          50%  { transform: rotate(${pos.rot}deg) translate(${pos.dx}px, ${pos.dy}px); }
+          75%  { transform: rotate(${pos.rot * 1.1}deg) translate(${pos.dx * 0.25}px, ${pos.dy * 0.6}px); }
+          100% { transform: rotate(${pos.rot}deg) translate(0px, 0px); }
+        }
+      `;
+      document.head.appendChild(styleEl);
+
+      // Random negative delay so animation starts mid-flow (no all-same-start)
+      const delay = -(Math.random() * pos.dur).toFixed(2);
+
       const el = document.createElement('div');
       el.className = 'poster';
       el.dataset.idx = i;
+      el.style.cssText = `
+        left: ${pos.x}%;
+        top: ${pos.y}%;
+        width: ${w}px;
+        animation: ${kfName} ${pos.dur}s ease-in-out ${delay}s infinite;
+        --poster-bg: ${c.bg};
+        --poster-accent: ${c.accent};
+        --poster-glow: ${c.glow};
+      `;
+
+      const displayTitle = c.query.split(' ').slice(0, 3).join(' ');
       el.innerHTML = `
-        <div class="poster-inner" style="background:${c.bg};">
-          <div class="poster-emoji">${c.emoji}</div>
-          <div class="poster-genre">${c.genre}</div>
-          <div class="poster-title-ko">${c.titleKo}</div>
-          <div class="poster-title">${c.query.split(' ').slice(0,3).join(' ')}</div>
-        </div>`;
+        <div class="poster-frame">
+          <div class="poster-fallback">${c.emoji}</div>
+          <div class="poster-shimmer" id="shimmer-${i}"></div>
+          <img class="poster-img" id="posterImg-${i}" alt="${displayTitle}">
+          <div class="poster-info">
+            <div class="poster-genre">${c.genre}</div>
+            <div class="poster-title">${displayTitle}</div>
+            <div class="poster-ko">${c.titleKo}</div>
+          </div>
+        </div>
+      `;
+
       el.addEventListener('click', () => onPosterClick(i));
+
+      // Hover: bring fully to front
+      el.addEventListener('mouseenter', () => el.style.zIndex = 100);
+      el.addEventListener('mouseleave', () => el.style.zIndex = 10);
+
       stage.appendChild(el);
-
-      // Dot
-      const dot = document.createElement('div');
-      dot.className = 'nav-dot';
-      dot.addEventListener('click', () => setActive(i));
-      dots.appendChild(dot);
     });
 
-    // Drag / swipe
-    stage.addEventListener('mousedown', e => { isDragging = true; dragStartX = e.clientX; });
-    stage.addEventListener('mousemove', e => { if (isDragging) dragDeltaX = e.clientX - dragStartX; });
-    stage.addEventListener('mouseup', finishDrag);
-    stage.addEventListener('mouseleave', finishDrag);
-    stage.addEventListener('touchstart', e => { isDragging = true; dragStartX = e.touches[0].clientX; }, { passive: true });
-    stage.addEventListener('touchmove', e => { if (isDragging) dragDeltaX = e.touches[0].clientX - dragStartX; }, { passive: true });
-    stage.addEventListener('touchend', finishDrag);
-
-    setActive(activeIdx, false);
+    // Load poster images async (TMDB or hardcoded)
+    loadAllPosters();
   }
 
-  function finishDrag() {
-    if (!isDragging) return;
-    isDragging = false;
-    if (dragDeltaX < -50 && activeIdx < CONTENTS.length - 1) setActive(activeIdx + 1);
-    else if (dragDeltaX > 50 && activeIdx > 0) setActive(activeIdx - 1);
-    dragDeltaX = 0;
+  async function loadAllPosters() {
+    for (let i = 0; i < CONTENTS.length; i++) {
+      loadPosterImage(i);
+    }
   }
 
-  function setActive(idx, animate = true) {
-    activeIdx = idx;
-    const posters = document.querySelectorAll('.poster');
-    const dots    = document.querySelectorAll('.nav-dot');
+  async function loadPosterImage(i) {
+    const c   = CONTENTS[i];
+    const img = document.getElementById(`posterImg-${i}`);
+    const shimmer = document.getElementById(`shimmer-${i}`);
+    if (!img) return;
 
-    posters.forEach((el, i) => {
-      const offset = i - idx;
-      const abs    = Math.abs(offset);
+    let url = c.posterUrl || null;
 
-      let scale   = Math.max(0.55, 1 - abs * 0.18);
-      let rotateY = offset * 40;
-      let tx      = offset * 160;
-      let tz      = -abs * 120;
-      let opacity = Math.max(0.25, 1 - abs * 0.28);
-      let zIndex  = 10 - abs;
+    // Try TMDB if no hardcoded URL
+    if (!url && c.tmdbQuery) {
+      try {
+        const res = await fetch(`/api/poster?q=${encodeURIComponent(c.tmdbQuery)}`);
+        const data = await res.json();
+        url = data.posterUrl || null;
+      } catch (e) { /* fallback */ }
+    }
 
-      const transform = `translateX(${tx}px) translateZ(${tz}px) rotateY(${rotateY}deg) scale(${scale})`;
-      el.style.setProperty('--poster-transform', transform);
-      el.style.transform = `${transform} translateY(0px)`;
-      el.style.opacity   = opacity;
-      el.style.zIndex    = zIndex;
-
-      // Shadow glow on active
-      const c = CONTENTS[i];
-      el.style.boxShadow = abs === 0
-        ? `0 30px 80px rgba(0,0,0,0.6), 0 0 60px ${c.accent}40`
-        : `0 20px 50px rgba(0,0,0,0.4)`;
-    });
-
-    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    if (url) {
+      img.src = url;
+      img.onload = () => {
+        img.classList.add('loaded');
+        shimmer?.classList.add('hidden');
+      };
+      img.onerror = () => shimmer?.classList.add('hidden');
+    } else {
+      shimmer?.classList.add('hidden');
+    }
   }
 
   function onPosterClick(i) {
-    if (i !== activeIdx) { setActive(i); return; }
-    doSearch(CONTENTS[i]);
+    const el = document.getElementById('scatterStage').querySelectorAll('.poster')[i];
+    el.classList.add('clicking');
+    setTimeout(() => {
+      el.classList.remove('clicking');
+      doSearch(CONTENTS[i], i);
+    }, 320);
   }
 
-  // ===== MOOD / MAP CONFIG =====
+  // ===== MOOD / MAP =====
   const MOOD_COLORS = {
     romantic:   { accent: '#FFB800', glow: 'rgba(255,184,0,0.2)',   emoji: '🌙', label: 'Romantic Night Seoul' },
     tense:      { accent: '#FF2D55', glow: 'rgba(255,45,85,0.2)',   emoji: '⚡', label: 'Tense Urban Seoul' },
@@ -707,12 +618,13 @@
     melancholy: { accent: '#A78BFA', glow: 'rgba(167,139,250,0.2)', emoji: '🌧️', label: 'Melancholy Seoul' },
     energetic:  { accent: '#34D399', glow: 'rgba(52,211,153,0.2)',  emoji: '🔥', label: 'Energetic Street Seoul' },
   };
+
   const MAP_STYLE = [
     { elementType: 'geometry',           stylers: [{ color: '#1d1d2b' }] },
     { elementType: 'labels.text.stroke', stylers: [{ color: '#1d1d2b' }] },
     { elementType: 'labels.text.fill',   stylers: [{ color: '#6b6b8a' }] },
-    { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#2a2a3d' }] },
-    { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0e0e1a' }] },
+    { featureType: 'road',    elementType: 'geometry', stylers: [{ color: '#2a2a3d' }] },
+    { featureType: 'water',   elementType: 'geometry', stylers: [{ color: '#0e0e1a' }] },
     { featureType: 'poi',     stylers: [{ visibility: 'off' }] },
     { featureType: 'transit', stylers: [{ visibility: 'off' }] },
   ];
@@ -721,12 +633,8 @@
 
   function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
-      center: { lat: 37.5665, lng: 126.978 },
-      zoom: 12,
-      styles: MAP_STYLE,
-      disableDefaultUI: true,
-      zoomControl: false,
-      gestureHandling: 'greedy',
+      center: { lat: 37.5665, lng: 126.978 }, zoom: 12,
+      styles: MAP_STYLE, disableDefaultUI: true, gestureHandling: 'greedy',
     });
   }
 
@@ -743,33 +651,26 @@
     clearMarkers();
     const bounds = new google.maps.LatLngBounds();
     const color  = (MOOD_COLORS[mood] || MOOD_COLORS.romantic).accent;
-
     locations.forEach((loc, i) => {
       const pos = { lat: loc.lat, lng: loc.lng };
       bounds.extend(pos);
       const marker = new google.maps.Marker({
         position: pos, map,
         label: { text: String(i + 1), color: '#0a0a0f', fontWeight: '700', fontSize: '11px' },
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          fillColor: color, fillOpacity: 1,
-          strokeColor: '#fff', strokeWeight: 2, scale: 14,
-        },
+        icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: color, fillOpacity: 1, strokeColor: '#fff', strokeWeight: 2, scale: 14 },
       });
-      marker.addListener('click', () => focusCard(i));
+      marker.addListener('click', () => {
+        document.querySelectorAll('.location-card').forEach(c => c.classList.remove('active'));
+        const card = document.getElementById(`card-${i}`);
+        card?.classList.add('active');
+        card?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      });
       markers.push(marker);
     });
-    map.fitBounds(bounds, { padding: 60, bottom: 260 });
+    map.fitBounds(bounds, { padding: 50, bottom: 240 });
   }
 
-  function focusCard(i) {
-    document.querySelectorAll('.location-card').forEach(c => c.classList.remove('active'));
-    const card = document.getElementById(`card-${i}`);
-    card?.classList.add('active');
-    card?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-  }
-
-  function buildCards(locations, mood) {
+  function buildCards(locations) {
     const panel = document.getElementById('cardsPanel');
     panel.innerHTML = '';
     locations.forEach((loc, i) => {
@@ -777,7 +678,7 @@
       card.className = 'location-card';
       card.id = `card-${i}`;
       card.innerHTML = `
-        <div class="card-num-row">
+        <div class="card-row1">
           <div class="card-num">${i + 1}</div>
           <div class="card-neighborhood">${loc.neighborhood}</div>
         </div>
@@ -797,19 +698,19 @@
     });
   }
 
-  // ===== GEMINI: LOCATIONS =====
+  // ===== GEMINI =====
   async function getLocations(query) {
-    const prompt = `You are a Seoul tourism expert who deeply understands K-content culture and Korean wave.
+    const prompt = `You are a Seoul tourism expert who deeply understands K-content culture.
 
 Given this K-content: "${query}"
 
-Analyze the emotional mood and atmosphere of this content, then recommend 5 real Seoul locations where a tourist could FEEL the same atmosphere. Choose actual, visitable places (cafes, streets, neighborhoods, parks, landmarks).
+Recommend 5 real, visitable Seoul locations that match its emotional atmosphere.
 
 Respond ONLY in this exact JSON format, no markdown:
 {
   "contentTitle": "the content name",
   "mood": "one of: romantic, tense, bright, melancholy, energetic",
-  "moodDescription": "2 sentence description of the content's atmosphere",
+  "moodDescription": "2 sentence atmosphere description",
   "locations": [
     {
       "nameKo": "Korean name",
@@ -817,14 +718,14 @@ Respond ONLY in this exact JSON format, no markdown:
       "neighborhood": "district/area",
       "lat": 37.xxx,
       "lng": 126.xxx,
-      "reason": "1 sentence why this matches the mood",
-      "imagePrompt": "A cinematic photorealistic artwork of [this specific Seoul location] at [time of day], [mood-specific atmosphere]. Atmospheric lighting, 4K quality, Korean urban aesthetic."
+      "reason": "1 sentence why this matches",
+      "imagePrompt": "Cinematic photorealistic artwork of [this Seoul location] at [time of day], [mood atmosphere]. 4K, Korean urban aesthetic."
     }
   ],
   "ost": {
-    "title": "Most iconic OST or theme song title",
-    "artist": "Artist or composer name",
-    "searchQuery": "YouTube search query (e.g. 'Way Back Then Squid Game OST official')",
+    "title": "Most iconic OST title",
+    "artist": "Artist name",
+    "searchQuery": "YouTube search query",
     "startSeconds": 30
   }
 }`;
@@ -846,7 +747,6 @@ Respond ONLY in this exact JSON format, no markdown:
     return JSON.parse(text);
   }
 
-  // ===== GEMINI: IMAGE =====
   async function generateImage(imagePrompt, index) {
     try {
       const res = await fetch('/api/gemini', {
@@ -871,9 +771,7 @@ Respond ONLY in this exact JSON format, no markdown:
           document.getElementById(`skeleton-${index}`)?.classList.add('hidden');
         };
       }
-    } catch (e) {
-      console.warn(`Image ${index} failed:`, e);
-    }
+    } catch (e) { console.warn(`Image ${index} failed:`, e); }
   }
 
   async function generateAllImages(locations) {
@@ -886,16 +784,14 @@ Respond ONLY in this exact JSON format, no markdown:
   // ===== SOUND MANAGER =====
   class SoundManager {
     constructor() {
-      this.player = null; this.isPlaying = false; this.isReady = false;
-      this.currentOst = null; this.pendingPlay = null;
+      this.player = null; this.isPlaying = false; this.isReady = false; this.pendingPlay = null;
       const div = document.createElement('div');
       div.id = 'yt-player';
-      div.style.cssText = 'position:fixed;bottom:0;left:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;';
+      div.style.cssText = 'position:fixed;bottom:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none;';
       document.body.appendChild(div);
     }
     _onReady() {
-      this.isReady = true;
-      this.player.setVolume(30);
+      this.isReady = true; this.player.setVolume(30);
       if (this.pendingPlay) { this._loadVideo(this.pendingPlay.videoId, this.pendingPlay.startSeconds); this.pendingPlay = null; }
     }
     _loadVideo(videoId, startSeconds) {
@@ -905,20 +801,18 @@ Respond ONLY in this exact JSON format, no markdown:
     }
     async changeMood(ostData) {
       if (!ostData) return;
-      this.currentOst = ostData;
       document.getElementById('audioMoodLabel').textContent = `🎵 ${ostData.title || 'OST'}`;
-      document.getElementById('audioArtist').textContent = ostData.artist || 'K-Content OST';
+      document.getElementById('audioArtist').textContent = ostData.artist || '—';
       const query   = ostData.searchQuery || `${ostData.title} ${ostData.artist} official`;
       const videoId = await this._searchYouTube(query);
       if (videoId) this._loadVideo(videoId, ostData.startSeconds || 0);
     }
     async _searchYouTube(query) {
       try {
-        const res = await fetch(`/api/youtube-search?q=${encodeURIComponent(query)}`);
+        const res  = await fetch(`/api/youtube-search?q=${encodeURIComponent(query)}`);
         const data = await res.json();
-        if (data.items?.length > 0) return data.items[0].id.videoId;
-      } catch (e) { console.warn('YouTube search failed:', e); }
-      return null;
+        return data.items?.[0]?.id?.videoId || null;
+      } catch { return null; }
     }
     toggle() {
       if (!this.player || !this.isReady) return this.isPlaying;
@@ -948,18 +842,29 @@ Respond ONLY in this exact JSON format, no markdown:
     document.getElementById('pauseIcon').style.display = playing ? 'block' : 'none';
   }
 
-  // ===== SCREEN TRANSITIONS =====
+  // ===== SCREENS =====
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
   }
 
   // ===== MAIN SEARCH =====
-  async function doSearch(content) {
-    // Loading screen
-    const preview = document.getElementById('loadPosterPreview');
-    preview.style.background = content.bg;
-    preview.textContent = content.emoji;
+  async function doSearch(content, idx) {
+    // Loading screen — show poster preview
+    const loadImg      = document.getElementById('loadImg');
+    const loadFallback = document.getElementById('loadFallback');
+    const posterImgEl  = document.getElementById(`posterImg-${idx}`);
+
+    if (posterImgEl?.classList.contains('loaded') && posterImgEl.src) {
+      loadImg.src = posterImgEl.src;
+      loadImg.style.display = 'block';
+      loadFallback.style.display = 'none';
+    } else {
+      loadFallback.textContent = content.emoji;
+      document.getElementById('loadPreview').style.background = content.bg;
+      loadImg.style.display = 'none';
+      loadFallback.style.display = 'flex';
+    }
     showScreen('loadingScreen');
 
     try {
@@ -969,14 +874,11 @@ Respond ONLY in this exact JSON format, no markdown:
       document.getElementById('resultTitle').textContent = data.contentTitle || content.query;
 
       showScreen('resultScreen');
-
       addMarkers(data.locations, data.mood);
-      buildCards(data.locations, data.mood);
+      buildCards(data.locations);
 
-      try {
-        await soundManager.changeMood(data.ost);
-        updateAudioUI(true);
-      } catch (e) { console.warn('Audio failed:', e); }
+      try { await soundManager.changeMood(data.ost); updateAudioUI(true); }
+      catch (e) { console.warn('Audio failed:', e); }
 
       generateAllImages(data.locations);
 
@@ -990,21 +892,12 @@ Respond ONLY in this exact JSON format, no markdown:
   }
 
   // ===== EVENTS =====
-  document.getElementById('backBtn').addEventListener('click', () => {
-    showScreen('landingScreen');
-  });
-
-  document.getElementById('audioPlayBtn').addEventListener('click', () => {
-    const playing = soundManager.toggle();
-    updateAudioUI(playing);
-  });
-
-  document.getElementById('audioVolume').addEventListener('input', e => {
-    soundManager.setVolume(parseInt(e.target.value));
-  });
+  document.getElementById('backBtn').addEventListener('click', () => showScreen('landingScreen'));
+  document.getElementById('audioPlayBtn').addEventListener('click', () => updateAudioUI(soundManager.toggle()));
+  document.getElementById('audioVolume').addEventListener('input', e => soundManager.setVolume(parseInt(e.target.value)));
 
   // ===== INIT =====
-  buildCoverflow();
+  buildScatter();
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
