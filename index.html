@@ -38,10 +38,21 @@
     }
     .screen.active { opacity: 1; pointer-events: auto; }
 
+    /* ===== LANDING MAP BACKGROUND ===== */
+    #landingMap {
+      position: absolute; inset: 0; z-index: 0;
+      opacity: 0.28; pointer-events: none;
+    }
+    .landing-map-dim {
+      position: absolute; inset: 0; z-index: 1;
+      background: rgba(10,10,15,0.55);
+      pointer-events: none;
+    }
+
     /* ===== ATMOSPHERIC ORBS ===== */
     .orb {
       position: absolute; border-radius: 50%;
-      pointer-events: none; z-index: 0;
+      pointer-events: none; z-index: 2;
     }
     .orb-1 {
       width: 75vw; height: 75vw; top: -22%; left: -12%;
@@ -81,7 +92,7 @@
 
     .landing-header {
       position: absolute; top: 0; left: 0; right: 0;
-      z-index: 50;
+      z-index: 60;
       padding: 26px 28px;
       display: flex; align-items: baseline; gap: 10px;
       pointer-events: none;
@@ -95,7 +106,7 @@
 
     /* Scatter stage — full screen canvas for posters */
     .scatter-stage {
-      position: absolute; inset: 0; overflow: hidden; z-index: 5;
+      position: absolute; inset: 0; overflow: hidden; z-index: 10;
     }
 
     /* Individual poster */
@@ -209,10 +220,11 @@
       align-items: center; justify-content: center; gap: 20px;
     }
     .load-preview {
-      width: 110px; height: 165px;
-      border-radius: 16px; overflow: hidden;
+      width: 200px; height: 300px;
+      border-radius: 22px; overflow: hidden;
       position: relative;
-      border: 2px solid rgba(255,255,255,0.1);
+      border: 2.5px solid rgba(255,255,255,0.12);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
       animation: loadBreath 1.6s ease-in-out infinite;
     }
     @keyframes loadBreath {
@@ -358,70 +370,123 @@
     }
     .skeleton.hidden { display: none; }
 
-    /* ===== IMAGE MODAL ===== */
-    .image-modal {
-      position: fixed; inset: 0; z-index: 300;
-      background: rgba(0,0,0,0.9);
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 24px;
+    /* ===== IMMERSIVE FULLSCREEN VIEW ===== */
+    .immersive {
+      position: fixed; inset: 0; z-index: 200;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.3s;
+      transition: opacity 0.4s;
     }
-    .image-modal.active { opacity: 1; pointer-events: auto; }
+    .immersive.active { opacity: 1; pointer-events: auto; }
 
-    .modal-img-wrap {
-      position: relative;
-      max-width: min(88vw, 680px);
-      max-height: 72vh;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 40px 120px rgba(0,0,0,0.85), 0 0 60px var(--accent-glow);
-      animation: modalPop 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+    .imm-bg {
+      position: absolute; inset: 0; background: #000;
     }
-    @keyframes modalPop {
-      from { transform: scale(0.88); opacity: 0; }
-      to   { transform: scale(1);    opacity: 1; }
+    /* Main full-bleed image */
+    .imm-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0; transition: opacity 0.5s;
     }
-    .modal-img-wrap img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      max-height: 72vh;
-      object-fit: contain;
-    }
-    .modal-caption {
-      margin-top: 16px;
-      text-align: center;
-    }
-    .modal-caption-name {
-      font-size: 1.05rem; font-weight: 700;
-    }
-    .modal-caption-neighborhood {
-      font-size: 0.75rem; color: var(--accent); margin-top: 4px;
-    }
-    .modal-close {
-      position: absolute; top: 20px; right: 20px;
-      width: 36px; height: 36px; border-radius: 50%;
-      background: rgba(255,255,255,0.12); border: none;
-      color: #fff; font-size: 1rem; cursor: pointer;
+    .imm-img.visible { opacity: 1; }
+
+    /* Loading placeholder shown before image arrives */
+    .imm-placeholder {
+      position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s;
+      font-size: 5rem; opacity: 0.3;
     }
-    .modal-close:hover { background: rgba(255,255,255,0.22); }
+    .imm-placeholder.hidden { display: none; }
 
-    /* Card image hover hint */
-    .card-image {
-      cursor: zoom-in;
-      position: relative;
+    /* Gradients for readability */
+    .imm-grad-top {
+      position: absolute; top: 0; left: 0; right: 0; height: 220px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.72) 0%, transparent 100%);
+      pointer-events: none;
     }
+    .imm-grad-bottom {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 320px;
+      background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    /* Top bar */
+    .imm-top {
+      position: absolute; top: 0; left: 0; right: 0;
+      padding: 20px 20px 0;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .imm-close {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fff; padding: 9px 16px 9px 12px;
+      border-radius: 40px; cursor: pointer; font-size: 0.85rem;
+      font-family: inherit; transition: background 0.2s;
+    }
+    .imm-close:hover { background: rgba(255,255,255,0.18); }
+    .imm-counter {
+      font-size: 0.8rem; color: rgba(255,255,255,0.6);
+      background: rgba(0,0,0,0.4);
+      padding: 6px 14px; border-radius: 40px;
+    }
+
+    /* Bottom info */
+    .imm-bottom {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 20px 24px 36px;
+    }
+    .imm-neighborhood {
+      font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 6px;
+      transition: color var(--transition);
+    }
+    .imm-name {
+      font-size: 1.6rem; font-weight: 900; line-height: 1.1;
+      letter-spacing: -0.02em; margin-bottom: 6px;
+    }
+    .imm-name-ko {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.9rem; color: rgba(255,255,255,0.55); margin-bottom: 10px;
+    }
+    .imm-reason {
+      font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.5;
+      max-width: 460px; margin-bottom: 20px;
+    }
+
+    /* Dot navigation */
+    .imm-dots {
+      display: flex; gap: 7px; align-items: center; margin-bottom: 4px;
+    }
+    .imm-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.25s;
+    }
+    .imm-dot.active { width: 20px; border-radius: 3px; background: var(--accent); }
+
+    /* Prev / Next arrow buttons */
+    .imm-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 48px; height: 48px; border-radius: 50%;
+      background: rgba(255,255,255,0.1); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fff; font-size: 1.5rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    .imm-arrow:hover { background: rgba(255,255,255,0.2); }
+    .imm-arrow.disabled { opacity: 0.2; pointer-events: none; }
+    .imm-prev { left: 16px; }
+    .imm-next { right: 16px; }
+
+    /* Card image — tap hint */
+    .card-image { cursor: pointer; position: relative; }
     .card-image::after {
       content: '⤢';
       position: absolute; top: 6px; right: 7px;
       font-size: 0.85rem; color: rgba(255,255,255,0.6);
-      opacity: 0; transition: opacity 0.2s;
-      pointer-events: none;
+      opacity: 0; transition: opacity 0.2s; pointer-events: none;
     }
     .card-image:hover::after { opacity: 1; }
 
@@ -440,6 +505,8 @@
 
 <!-- ===== LANDING ===== -->
 <div class="screen active" id="landingScreen">
+  <div id="landingMap"></div>
+  <div class="landing-map-dim"></div>
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
@@ -490,16 +557,26 @@
   </div>
 </div>
 
-<!-- Image modal -->
-<div class="image-modal" id="imageModal" onclick="closeImageModal()">
-  <button class="modal-close" onclick="closeImageModal()">✕</button>
-  <div class="modal-img-wrap" onclick="event.stopPropagation()">
-    <img id="modalImg" alt="">
+<!-- Immersive fullscreen image view -->
+<div class="immersive" id="immersiveView">
+  <div class="imm-bg"></div>
+  <div class="imm-placeholder" id="immPlaceholder"></div>
+  <img class="imm-img" id="immImg" alt="">
+  <div class="imm-grad-top"></div>
+  <div class="imm-grad-bottom"></div>
+  <div class="imm-top">
+    <button class="imm-close" id="immClose">← Map</button>
+    <div class="imm-counter" id="immCounter">1 / 5</div>
   </div>
-  <div class="modal-caption" onclick="event.stopPropagation()">
-    <div class="modal-caption-name" id="modalName"></div>
-    <div class="modal-caption-neighborhood" id="modalNeighborhood"></div>
+  <div class="imm-bottom">
+    <div class="imm-neighborhood" id="immNeighborhood"></div>
+    <div class="imm-name" id="immName"></div>
+    <div class="imm-name-ko" id="immNameKo"></div>
+    <div class="imm-reason" id="immReason"></div>
+    <div class="imm-dots" id="immDots"></div>
   </div>
+  <button class="imm-arrow imm-prev" id="immPrev">‹</button>
+  <button class="imm-arrow imm-next" id="immNext">›</button>
 </div>
 
 <div class="error-toast" id="errorMsg">😔 Something went wrong. Try again.</div>
@@ -537,11 +614,12 @@
       titleKo: '케이팝 악마헌터', emoji: '😈', genre: 'Action',
       bg: 'linear-gradient(160deg,#080f05,#102008,#0a0a0f)',
       accent: '#34D399', glow: 'rgba(52,211,153,0.35)',
+      ost: { title: 'Golden', artist: 'Jungkook', searchQuery: 'Jungkook Golden official MV', startSeconds: 55 },
     },
     {
-      query: 'When Life Gives You Tangerines 귤이 익는 시절',
-      tmdbQuery: '귤이 익는 시절',
-      titleKo: '귤이 익는 시절', emoji: '🍊', genre: 'Drama',
+      query: '폭삭 속았수다',
+      tmdbQuery: '폭삭 속았수다',
+      titleKo: '폭삭 속았수다', emoji: '🍊', genre: 'Drama',
       bg: 'linear-gradient(160deg,#1a0d00,#2d1800,#0a0a0f)',
       accent: '#FFB800', glow: 'rgba(255,184,0,0.35)',
     },
@@ -570,13 +648,13 @@
   // w = desktop width (px), wm = mobile width (px)
   // positions chosen so posters stay mostly on-screen across common viewport sizes
   const LAYOUT = [
-    { x:  3,  y:  4,  rot: -5, w: 238, wm: 158, dx:  5, dy: -13, dur: 6.8 },  // top-left
-    { x: 34,  y:  2,  rot:  4, w: 258, wm: 170, dx: -4, dy: -11, dur: 7.4 },  // top-center
-    { x: 64,  y:  5,  rot: -7, w: 222, wm: 148, dx:  6, dy: -10, dur: 6.1 },  // top-right
-    { x:  4,  y: 46,  rot:  6, w: 242, wm: 160, dx:  6, dy: -14, dur: 7.9 },  // mid-left
-    { x: 38,  y: 43,  rot: -3, w: 268, wm: 175, dx: -5, dy: -13, dur: 6.5 },  // mid-center (hero)
-    { x: 66,  y: 45,  rot:  8, w: 228, wm: 152, dx:  4, dy: -11, dur: 7.6 },  // mid-right
-    { x: 24,  y: 64,  rot: -5, w: 248, wm: 163, dx: -5, dy: -12, dur: 6.3 },  // bottom-center
+    { x:  3,  y:  4,  rot: -5, w: 300, wm: 190, dx:  5, dy: -13, dur: 6.8 },  // top-left
+    { x: 34,  y:  2,  rot:  4, w: 320, wm: 205, dx: -4, dy: -11, dur: 7.4 },  // top-center
+    { x: 64,  y:  5,  rot: -7, w: 285, wm: 182, dx:  6, dy: -10, dur: 6.1 },  // top-right
+    { x:  4,  y: 46,  rot:  6, w: 305, wm: 195, dx:  6, dy: -14, dur: 7.9 },  // mid-left
+    { x: 38,  y: 43,  rot: -3, w: 335, wm: 215, dx: -5, dy: -13, dur: 6.5 },  // mid-center (hero)
+    { x: 66,  y: 45,  rot:  8, w: 290, wm: 188, dx:  4, dy: -11, dur: 7.6 },  // mid-right
+    { x: 24,  y: 64,  rot: -5, w: 310, wm: 200, dx: -5, dy: -12, dur: 6.3 },  // bottom-center
   ];
 
   const isMobile = window.innerWidth < 640;
@@ -710,12 +788,20 @@
     { featureType: 'transit', stylers: [{ visibility: 'off' }] },
   ];
 
-  let map, markers = [];
+  let map, landingMap, markers = [], currentLocations = [], immersiveIdx = 0;
 
   function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
       center: { lat: 37.5665, lng: 126.978 }, zoom: 12,
       styles: MAP_STYLE, disableDefaultUI: true, gestureHandling: 'greedy',
+    });
+    // Landing background map — static, non-interactive
+    landingMap = new google.maps.Map(document.getElementById('landingMap'), {
+      center: { lat: 37.5665, lng: 126.978 }, zoom: 12,
+      styles: MAP_STYLE, disableDefaultUI: true,
+      gestureHandling: 'none', draggable: false,
+      scrollwheel: false, disableDoubleClickZoom: true,
+      keyboardShortcuts: false,
     });
   }
 
@@ -745,6 +831,7 @@
         const card = document.getElementById(`card-${i}`);
         card?.classList.add('active');
         card?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        openImmersive(i);
       });
       markers.push(marker);
     });
@@ -774,14 +861,11 @@
         document.querySelectorAll('.location-card').forEach(c => c.classList.remove('active'));
         card.classList.add('active');
         if (map) { map.panTo({ lat: loc.lat, lng: loc.lng }); map.setZoom(15); }
+        openImmersive(i);
       });
-      // Image click → fullscreen modal
       card.querySelector('.card-image').addEventListener('click', e => {
         e.stopPropagation();
-        const img = document.getElementById(`img-${i}`);
-        if (img?.classList.contains('loaded')) {
-          openImageModal(img.src, loc.nameEn, loc.neighborhood);
-        }
+        openImmersive(i);
       });
       panel.appendChild(card);
     });
@@ -959,6 +1043,7 @@ Respond ONLY in this exact JSON format, no markdown:
     try {
       const data = await getLocations(content.query);
 
+      currentLocations = data.locations;
       applyMood(data.mood);
       document.getElementById('resultTitle').textContent = data.contentTitle || content.query;
 
@@ -966,7 +1051,7 @@ Respond ONLY in this exact JSON format, no markdown:
       addMarkers(data.locations, data.mood);
       buildCards(data.locations);
 
-      try { await soundManager.changeMood(data.ost); updateAudioUI(true); }
+      try { await soundManager.changeMood(content.ost || data.ost); updateAudioUI(true); }
       catch (e) { console.warn('Audio failed:', e); }
 
       generateAllImages(data.locations);
@@ -985,18 +1070,96 @@ Respond ONLY in this exact JSON format, no markdown:
   document.getElementById('audioPlayBtn').addEventListener('click', () => updateAudioUI(soundManager.toggle()));
   document.getElementById('audioVolume').addEventListener('input', e => soundManager.setVolume(parseInt(e.target.value)));
 
-  // ===== IMAGE MODAL =====
-  function openImageModal(src, name, neighborhood) {
-    const modal = document.getElementById('imageModal');
-    document.getElementById('modalImg').src = src;
-    document.getElementById('modalName').textContent = name;
-    document.getElementById('modalNeighborhood').textContent = neighborhood;
-    modal.classList.add('active');
+  // ===== IMMERSIVE VIEW =====
+  function openImmersive(idx) {
+    immersiveIdx = idx;
+    renderImmersive();
+    document.getElementById('immersiveView').classList.add('active');
   }
-  function closeImageModal() {
-    document.getElementById('imageModal').classList.remove('active');
+
+  function closeImmersive() {
+    document.getElementById('immersiveView').classList.remove('active');
   }
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeImageModal(); });
+
+  function navigateImmersive(dir) {
+    const newIdx = immersiveIdx + dir;
+    if (newIdx < 0 || newIdx >= currentLocations.length) return;
+    immersiveIdx = newIdx;
+    renderImmersive();
+  }
+
+  function renderImmersive() {
+    const loc   = currentLocations[immersiveIdx];
+    const total = currentLocations.length;
+    if (!loc) return;
+
+    document.getElementById('immCounter').textContent     = `${immersiveIdx + 1} / ${total}`;
+    document.getElementById('immNeighborhood').textContent = loc.neighborhood;
+    document.getElementById('immName').textContent         = loc.nameEn;
+    document.getElementById('immNameKo').textContent       = loc.nameKo;
+    document.getElementById('immReason').textContent       = loc.reason;
+
+    // Dots
+    const dotsEl = document.getElementById('immDots');
+    dotsEl.innerHTML = '';
+    for (let i = 0; i < total; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'imm-dot' + (i === immersiveIdx ? ' active' : '');
+      dot.addEventListener('click', () => { immersiveIdx = i; renderImmersive(); });
+      dotsEl.appendChild(dot);
+    }
+
+    // Arrow visibility
+    document.getElementById('immPrev').classList.toggle('disabled', immersiveIdx === 0);
+    document.getElementById('immNext').classList.toggle('disabled', immersiveIdx === total - 1);
+
+    // Image
+    const immImg         = document.getElementById('immImg');
+    const immPlaceholder = document.getElementById('immPlaceholder');
+    const srcImg         = document.getElementById(`img-${immersiveIdx}`);
+
+    immImg.classList.remove('visible');
+    immImg.src = '';
+    immPlaceholder.textContent = '⏳';
+    immPlaceholder.classList.remove('hidden');
+
+    const tryLoad = (attempts) => {
+      const img = document.getElementById(`img-${immersiveIdx}`);
+      if (img?.classList.contains('loaded') && img.src) {
+        immImg.onload = () => {
+          immImg.classList.add('visible');
+          immPlaceholder.classList.add('hidden');
+        };
+        immImg.src = img.src;
+      } else if (attempts > 0) {
+        setTimeout(() => tryLoad(attempts - 1), 600);
+      }
+    };
+    tryLoad(30); // poll up to ~18s
+  }
+
+  // Button events
+  document.getElementById('immClose').addEventListener('click', closeImmersive);
+  document.getElementById('immPrev').addEventListener('click', () => navigateImmersive(-1));
+  document.getElementById('immNext').addEventListener('click', () => navigateImmersive(1));
+
+  // Keyboard nav
+  document.addEventListener('keydown', e => {
+    if (!document.getElementById('immersiveView').classList.contains('active')) return;
+    if (e.key === 'Escape')      closeImmersive();
+    if (e.key === 'ArrowLeft')   navigateImmersive(-1);
+    if (e.key === 'ArrowRight')  navigateImmersive(1);
+  });
+
+  // Touch swipe on immersive
+  let immTouchX = 0;
+  document.getElementById('immersiveView').addEventListener('touchstart', e => {
+    immTouchX = e.touches[0].clientX;
+  }, { passive: true });
+  document.getElementById('immersiveView').addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - immTouchX;
+    if (Math.abs(dx) > 50) navigateImmersive(dx < 0 ? 1 : -1);
+  }, { passive: true });
 
   // ===== INIT =====
   buildScatter();
