@@ -2,7 +2,7 @@
   "name": "Vibe Seoul",
   "short_name": "VibeSL",
   "description": "Feel K-Content Through Seoul — AI-powered sensory tourism",
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0a0a0f",
