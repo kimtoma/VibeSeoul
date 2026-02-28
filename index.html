@@ -492,6 +492,49 @@
     }
 
     .footer-credit a { color: var(--accent); text-decoration: none; }
+
+    /* ===== SETTINGS ===== */
+    .settings-btn {
+      background: none; border: none; color: var(--text-dim); cursor: pointer;
+      padding: 8px; border-radius: 8px; transition: var(--transition);
+    }
+    .settings-btn:hover { color: var(--accent); background: rgba(255,255,255,0.05); }
+
+    .settings-overlay {
+      display: none; position: fixed; inset: 0; z-index: 999;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+      justify-content: center; align-items: center;
+    }
+    .settings-overlay.active { display: flex; }
+
+    .settings-modal {
+      background: #16161f; border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px; padding: 32px; width: min(420px, 90vw);
+    }
+    .settings-modal h2 { font-size: 1.3rem; margin-bottom: 4px; }
+    .settings-desc { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 20px; line-height: 1.5; }
+    .settings-label {
+      display: block; color: var(--text-dim); font-size: 0.8rem;
+      margin-bottom: 14px; font-weight: 500;
+    }
+    .settings-label input {
+      display: block; width: 100%; margin-top: 6px; padding: 10px 14px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px; color: var(--text); font-size: 0.9rem;
+      font-family: 'Outfit', monospace; outline: none; transition: var(--transition);
+    }
+    .settings-label input:focus { border-color: var(--accent); }
+    .settings-actions { margin-top: 20px; }
+    .settings-save {
+      width: 100%; padding: 12px; background: var(--accent); color: #000;
+      border: none; border-radius: 12px; font-weight: 700; font-size: 1rem;
+      cursor: pointer; font-family: 'Outfit', sans-serif; transition: var(--transition);
+    }
+    .settings-save:hover { filter: brightness(1.1); transform: scale(1.02); }
+    .settings-hint {
+      text-align: center; margin-top: 14px; font-size: 0.75rem; color: var(--text-dim);
+    }
+    .settings-hint a { color: var(--accent); text-decoration: none; }
   </style>
 </head>
 <body>
@@ -500,7 +543,30 @@
   <header>
     <div class="logo">Vibe<span>Seoul</span></div>
     <div class="header-sub">Feel K-Content</div>
+    <button class="settings-btn" id="settingsBtn" aria-label="Settings">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.61 3.61 0 0112 15.6z"/></svg>
+    </button>
   </header>
+
+  <!-- API KEY SETTINGS MODAL -->
+  <div class="settings-overlay" id="settingsOverlay">
+    <div class="settings-modal">
+      <h2>API Key Settings</h2>
+      <p class="settings-desc">API 키를 입력해주세요. 키는 브라우저에만 저장되며 외부로 전송되지 않습니다.</p>
+      <label class="settings-label">
+        Gemini API Key
+        <input type="password" id="geminiKeyInput" placeholder="AIzaSy..." autocomplete="off">
+      </label>
+      <label class="settings-label">
+        Google Maps API Key
+        <input type="password" id="mapsKeyInput" placeholder="AIzaSy..." autocomplete="off">
+      </label>
+      <div class="settings-actions">
+        <button class="settings-save" id="settingsSave">Save & Start</button>
+      </div>
+      <p class="settings-hint">키 발급: <a href="https://aistudio.google.com/apikey" target="_blank">Gemini</a> · <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Maps</a></p>
+    </div>
+  </div>
 
   <!-- HERO / SEARCH -->
   <section class="hero" id="hero">
@@ -565,9 +631,9 @@
 
   <!-- GOOGLE MAPS -->
   <script>
-    // ===== CONFIG =====
-    const GEMINI_API_KEY = 'AIzaSyCkconMBdg6hgzIPL-0weJRD3TYY13Aqbg';
-    const GOOGLE_MAPS_API_KEY = 'AIzaSyBCNXZvzN-Hetj4vkj8YO6ZsdhziJJrqnc';
+    // ===== CONFIG (loaded from localStorage) =====
+    let GEMINI_API_KEY = localStorage.getItem('vibeseoul_gemini_key') || '';
+    let GOOGLE_MAPS_API_KEY = localStorage.getItem('vibeseoul_maps_key') || '';
 
     // ===== MOOD COLORS =====
     const MOOD_COLORS = {
@@ -995,11 +1061,53 @@ Respond ONLY in this exact JSON format, no markdown:
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(() => {});
     }
-  </script>
 
-  <!-- Load Google Maps -->
-  <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBCNXZvzN-Hetj4vkj8YO6ZsdhziJJrqnc&callback=initMap">
+    // ===== API KEY SETTINGS =====
+    const settingsOverlay = document.getElementById('settingsOverlay');
+    const geminiKeyInput = document.getElementById('geminiKeyInput');
+    const mapsKeyInput = document.getElementById('mapsKeyInput');
+
+    function loadGoogleMaps() {
+      if (!GOOGLE_MAPS_API_KEY || document.getElementById('gmaps-script')) return;
+      const s = document.createElement('script');
+      s.id = 'gmaps-script';
+      s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&callback=initMap`;
+      s.async = true;
+      s.defer = true;
+      document.body.appendChild(s);
+    }
+
+    function showSettings() {
+      geminiKeyInput.value = GEMINI_API_KEY;
+      mapsKeyInput.value = GOOGLE_MAPS_API_KEY;
+      settingsOverlay.classList.add('active');
+    }
+
+    function saveSettings() {
+      const gk = geminiKeyInput.value.trim();
+      const mk = mapsKeyInput.value.trim();
+      if (!gk || !mk) { alert('두 API 키를 모두 입력해주세요.'); return; }
+      localStorage.setItem('vibeseoul_gemini_key', gk);
+      localStorage.setItem('vibeseoul_maps_key', mk);
+      GEMINI_API_KEY = gk;
+      GOOGLE_MAPS_API_KEY = mk;
+      settingsOverlay.classList.remove('active');
+      loadGoogleMaps();
+    }
+
+    document.getElementById('settingsBtn').addEventListener('click', showSettings);
+    document.getElementById('settingsSave').addEventListener('click', saveSettings);
+    settingsOverlay.addEventListener('click', (e) => {
+      if (e.target === settingsOverlay && GEMINI_API_KEY && GOOGLE_MAPS_API_KEY)
+        settingsOverlay.classList.remove('active');
+    });
+
+    // Show settings on first visit if no keys saved
+    if (!GEMINI_API_KEY || !GOOGLE_MAPS_API_KEY) {
+      showSettings();
+    } else {
+      loadGoogleMaps();
+    }
   </script>
 
 </body>
