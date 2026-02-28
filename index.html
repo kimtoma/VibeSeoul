@@ -10,7 +10,7 @@
   <meta name="description" content="Transform K-content into sensory Seoul experiences with AI-powered location mapping, artwork, and soundscapes.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=Noto+Sans+KR:wght@300;500;700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
   <style>
     /* ===== RESET & BASE ===== */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -558,7 +558,7 @@
     </button>
     <div class="audio-info">
       <div class="audio-mood-label" id="audioMoodLabel">🎵 Ready to vibe</div>
-      <div class="audio-sub">Ambient Soundscape</div>
+      <div class="audio-sub">K-Content OST</div>
     </div>
     <input type="range" class="audio-volume" id="audioVolume" min="0" max="100" value="30">
   </div>
@@ -714,7 +714,12 @@ Respond ONLY in this exact JSON format, no markdown:
       "imagePrompt": "A cinematic photorealistic artwork of [this specific Seoul location with details] at [time of day], [mood-specific atmosphere]. Atmospheric lighting, 4K quality, Korean urban aesthetic."
     }
   ],
-  "soundMood": "one of: romantic_night, tense_urban, bright_retro, melancholy_rain, energetic_street"
+  "ost": {
+    "title": "The most iconic and recognizable OST or theme song title",
+    "artist": "Artist or composer name",
+    "searchQuery": "YouTube search query to find this exact song (e.g. 'Way Back Then Squid Game OST official')",
+    "startSeconds": "Number: the timestamp in seconds where the most recognizable highlight/hook/chorus begins"
+  }
 }`;
 
       const res = await fetch(
@@ -780,171 +785,134 @@ Respond ONLY in this exact JSON format, no markdown:
       }
     }
 
-    // ===== SOUND MANAGER =====
+    // ===== SOUND MANAGER (YouTube IFrame API) =====
     class SoundManager {
       constructor() {
+        this.player = null;
         this.isPlaying = false;
-        this.initialized = false;
-        this.synths = {};
-        this.currentMood = null;
+        this.isReady = false;
+        this.currentOst = null;
+        this.pendingPlay = null;
+
+        // Hidden YouTube player container
+        const div = document.createElement('div');
+        div.id = 'yt-player';
+        div.style.cssText = 'position:fixed;bottom:0;left:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;';
+        document.body.appendChild(div);
       }
 
-      async init() {
-        if (this.initialized) return;
-        await Tone.start();
-        this.reverb = new Tone.Reverb({ decay: 4, wet: 0.6 }).toDestination();
-        this.vol = new Tone.Volume(-12).connect(this.reverb);
-        this.initialized = true;
+      _onReady() {
+        this.isReady = true;
+        this.player.setVolume(30);
+        if (this.pendingPlay) {
+          this._loadVideo(this.pendingPlay.videoId, this.pendingPlay.startSeconds);
+          this.pendingPlay = null;
+        }
       }
 
-      createMood(mood) {
-        // Clean up previous
-        this.stop();
-        Object.values(this.synths).forEach(s => { try { s.dispose(); } catch(e){} });
-        this.synths = {};
-
-        const presets = {
-          romantic_night: () => {
-            const pad = new Tone.PolySynth(Tone.FMSynth, {
-              envelope: { attack: 1.5, decay: 1, sustain: 0.8, release: 2 },
-              modulation: { type: 'sine' },
-              modulationIndex: 2,
-            }).connect(this.vol);
-            pad.volume.value = -8;
-
-            const chords = [['C4','E4','G4','B4'], ['A3','C4','E4','G4'], ['F3','A3','C4','E4'], ['G3','B3','D4','F4']];
-            const pattern = new Tone.Pattern((time, chord) => {
-              pad.triggerAttackRelease(chord, '2n', time, 0.3);
-            }, chords, 'up');
-            pattern.interval = '2m';
-
-            this.synths = { pad, pattern };
-            Tone.Transport.bpm.value = 60;
-          },
-
-          tense_urban: () => {
-            const drone = new Tone.FMSynth({
-              envelope: { attack: 2, decay: 0, sustain: 1, release: 2 },
-              modulation: { type: 'sawtooth' },
-              modulationIndex: 8,
-            }).connect(this.vol);
-            drone.volume.value = -10;
-
-            const pattern = new Tone.Loop((time) => {
-              drone.triggerAttackRelease('C2', '4m', time, 0.4);
-            }, '4m');
-
-            const perc = new Tone.MetalSynth({
-              envelope: { attack: 0.01, decay: 0.4, release: 0.2 },
-              volume: -20,
-            }).connect(this.vol);
-
-            const percPattern = new Tone.Pattern((time) => {
-              perc.triggerAttackRelease('8n', time, Math.random() * 0.3);
-            }, [null, null, 1, null, null, 1, null], 'up');
-            percPattern.interval = '4n';
-
-            this.synths = { drone, pattern, perc, percPattern };
-            Tone.Transport.bpm.value = 80;
-          },
-
-          bright_retro: () => {
-            const lead = new Tone.PolySynth(Tone.Synth, {
-              oscillator: { type: 'square' },
-              envelope: { attack: 0.05, decay: 0.3, sustain: 0.4, release: 0.5 },
-            }).connect(this.vol);
-            lead.volume.value = -12;
-
-            const chords = [['D4','F#4','A4'], ['A3','C#4','E4'], ['B3','D4','F#4'], ['G3','B3','D4']];
-            const pattern = new Tone.Pattern((time, chord) => {
-              lead.triggerAttackRelease(chord, '4n', time, 0.4);
-            }, chords, 'up');
-            pattern.interval = '1m';
-
-            this.synths = { lead, pattern };
-            Tone.Transport.bpm.value = 110;
-          },
-
-          melancholy_rain: () => {
-            const pad = new Tone.PolySynth(Tone.AMSynth, {
-              envelope: { attack: 2, decay: 1.5, sustain: 0.6, release: 3 },
-            }).connect(this.vol);
-            pad.volume.value = -10;
-
-            const chords = [['A3','C4','E4'], ['C3','E3','G3'], ['E3','G3','B3'], ['G3','B3','D4']];
-            const pattern = new Tone.Pattern((time, chord) => {
-              pad.triggerAttackRelease(chord, '1m', time, 0.25);
-            }, chords, 'up');
-            pattern.interval = '2m';
-
-            // Rain noise
-            const noise = new Tone.Noise('brown').connect(
-              new Tone.AutoFilter({ frequency: 0.5, depth: 0.8 }).connect(
-                new Tone.Volume(-25).connect(this.reverb)
-              ).start()
-            );
-
-            this.synths = { pad, pattern, noise };
-            Tone.Transport.bpm.value = 50;
-          },
-
-          energetic_street: () => {
-            const bass = new Tone.MonoSynth({
-              oscillator: { type: 'sawtooth' },
-              filter: { Q: 4, type: 'lowpass', frequency: 400 },
-              envelope: { attack: 0.05, decay: 0.2, sustain: 0.5, release: 0.3 },
-            }).connect(this.vol);
-            bass.volume.value = -8;
-
-            const pattern = new Tone.Sequence((time, note) => {
-              if (note) bass.triggerAttackRelease(note, '8n', time, 0.7);
-            }, ['E2', null, 'E2', 'G2', null, 'A2', null, 'B2'], '8n');
-
-            this.synths = { bass, pattern };
-            Tone.Transport.bpm.value = 120;
-          },
-        };
-
-        if (presets[mood]) presets[mood]();
-        this.currentMood = mood;
-      }
-
-      play() {
-        Object.values(this.synths).forEach(s => {
-          if (s.start && typeof s.state !== 'undefined' && s.state !== 'started') s.start();
+      _loadVideo(videoId, startSeconds) {
+        if (!this.isReady || !this.player) {
+          this.pendingPlay = { videoId, startSeconds };
+          return;
+        }
+        this.player.loadVideoById({
+          videoId: videoId,
+          startSeconds: startSeconds || 0,
         });
-        Tone.Transport.start();
         this.isPlaying = true;
       }
 
-      stop() {
-        Tone.Transport.stop();
-        Object.values(this.synths).forEach(s => {
-          if (s.stop) try { s.stop(); } catch(e){}
-        });
-        this.isPlaying = false;
+      async init() {
+        // YouTube API initializes via global callback — no-op for compatibility
+      }
+
+      async changeMood(ostData) {
+        if (!ostData) return;
+        this.currentOst = ostData;
+
+        // Update audio bar labels immediately
+        document.getElementById('audioMoodLabel').textContent =
+          `🎵 ${ostData.title || 'OST'}`;
+        document.querySelector('.audio-sub').textContent =
+          ostData.artist || 'K-Content OST';
+
+        // Search YouTube for the real video ID using Data API v3
+        const query = ostData.searchQuery || `${ostData.title} ${ostData.artist} official`;
+        const videoId = await this._searchYouTube(query);
+
+        if (videoId) {
+          this._loadVideo(videoId, ostData.startSeconds || 0);
+        } else {
+          console.warn('Could not find YouTube video for:', query);
+        }
+      }
+
+      async _searchYouTube(query) {
+        try {
+          const res = await fetch(
+            `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&videoCategoryId=10&maxResults=1&key=${GOOGLE_MAPS_API_KEY}`
+          );
+          const data = await res.json();
+          if (data.items && data.items.length > 0) {
+            return data.items[0].id.videoId;
+          }
+          if (data.error) {
+            console.warn('YouTube API error:', data.error.message);
+          }
+        } catch (e) {
+          console.warn('YouTube search failed:', e);
+        }
+        return null;
       }
 
       toggle() {
-        if (this.isPlaying) this.stop();
-        else this.play();
+        if (!this.player || !this.isReady) return this.isPlaying;
+        if (this.isPlaying) {
+          this.player.pauseVideo();
+          this.isPlaying = false;
+        } else {
+          this.player.playVideo();
+          this.isPlaying = true;
+        }
         return this.isPlaying;
       }
 
       setVolume(val) {
-        // val: 0-100
-        const db = val === 0 ? -Infinity : Tone.gainToDb(val / 100);
-        if (this.vol) this.vol.volume.value = db;
-      }
-
-      async changeMood(mood) {
-        await this.init();
-        this.createMood(mood);
-        this.play();
+        if (this.player && this.isReady) {
+          this.player.setVolume(val); // YT accepts 0-100
+        }
       }
     }
 
     const soundManager = new SoundManager();
+
+    // YouTube IFrame API global callback
+    function onYouTubeIframeAPIReady() {
+      soundManager.player = new YT.Player('yt-player', {
+        height: '1',
+        width: '1',
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
+          modestbranding: 1,
+          rel: 0,
+        },
+        events: {
+          onReady: () => soundManager._onReady(),
+          onStateChange: (e) => {
+            soundManager.isPlaying = e.data === YT.PlayerState.PLAYING;
+            updateAudioUI(soundManager.isPlaying);
+          },
+          onError: (e) => {
+            console.warn('YouTube player error:', e.data);
+            soundManager.isPlaying = false;
+            updateAudioUI(false);
+          },
+        },
+      });
+    }
 
     // ===== MAIN SEARCH =====
     async function doSearch(query) {
@@ -971,10 +939,10 @@ Respond ONLY in this exact JSON format, no markdown:
         addMarkers(data.locations, data.mood);
         buildCards(data.locations);
 
-        // 4. Start sound
+        // 4. Start OST playback
         document.getElementById('audioBar').classList.add('active');
         try {
-          await soundManager.changeMood(data.soundMood);
+          await soundManager.changeMood(data.ost);
           updateAudioUI(true);
         } catch (e) {
           console.warn('Audio failed:', e);
