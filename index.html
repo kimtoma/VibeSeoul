@@ -566,8 +566,7 @@
   <!-- GOOGLE MAPS -->
   <script>
     // ===== CONFIG =====
-    const GEMINI_API_KEY = 'AIzaSyCkconMBdg6hgzIPL-0weJRD3TYY13Aqbg';
-    const GOOGLE_MAPS_API_KEY = 'AIzaSyBCNXZvzN-Hetj4vkj8YO6ZsdhziJJrqnc';
+    // API keys are stored server-side as environment variables.
 
     // ===== MOOD COLORS =====
     const MOOD_COLORS = {
@@ -722,17 +721,17 @@ Respond ONLY in this exact JSON format, no markdown:
   }
 }`;
 
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+      const res = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'gemini-2.5-flash',
+          body: {
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: { temperature: 0.8, topP: 0.95, responseMimeType: 'application/json' },
-          }),
-        }
-      );
+          },
+        }),
+      });
 
       const data = await res.json();
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -743,17 +742,17 @@ Respond ONLY in this exact JSON format, no markdown:
     // ===== GEMINI: GENERATE IMAGE =====
     async function generateImage(imagePrompt, index) {
       try {
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent?key=${GEMINI_API_KEY}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
+        const res = await fetch('/api/gemini', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'gemini-3.1-flash-image-preview',
+            body: {
               contents: [{ parts: [{ text: imagePrompt }] }],
               generationConfig: { responseModalities: ['TEXT', 'IMAGE'] },
-            }),
-          }
-        );
+            },
+          }),
+        });
 
         const data = await res.json();
         const parts = data.candidates?.[0]?.content?.parts || [];
@@ -850,7 +849,7 @@ Respond ONLY in this exact JSON format, no markdown:
       async _searchYouTube(query) {
         try {
           const res = await fetch(
-            `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&videoCategoryId=10&maxResults=1&key=${GOOGLE_MAPS_API_KEY}`
+            `/api/youtube-search?q=${encodeURIComponent(query)}`
           );
           const data = await res.json();
           if (data.items && data.items.length > 0) {
@@ -997,10 +996,8 @@ Respond ONLY in this exact JSON format, no markdown:
     }
   </script>
 
-  <!-- Load Google Maps -->
-  <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBCNXZvzN-Hetj4vkj8YO6ZsdhziJJrqnc&callback=initMap">
-  </script>
+  <!-- Load Google Maps (key injected server-side) -->
+  <script src="/api/maps-script"></script>
 
 </body>
 </html>
